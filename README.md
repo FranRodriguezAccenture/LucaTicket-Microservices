@@ -108,7 +108,7 @@ ng build --prod
 
 ## 🎨 FASE 03: Frontend Angular - Listado de Eventos
 
-<img src="/images/EVENTO_LISTADO.png" alt="Eventos">
+<img src="/images/EVENTOS_LISTADO.png" alt="Eventos">
 <img src="/images/EVENTO_DETALLADO_1.png" alt="Eventos">
 <img src="/images/EVENTO_DETALLADO_2.png" alt="Eventos">
 
