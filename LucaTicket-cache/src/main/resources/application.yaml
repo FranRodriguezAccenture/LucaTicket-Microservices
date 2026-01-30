@@ -1,0 +1,83 @@
+server:
+  port: 8083
+  servlet:
+    context-path: /cache-service
+
+spring:
+  application:
+    name: cache-service
+  
+  # Configuración de Redis
+  cache:
+    type: redis
+    redis:
+      time-to-live: 600000  # 10 minutos en ms
+      cache-null-values: false
+      key-prefix: "lucaticket:"
+      use-key-prefix: true
+  
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:}
+      timeout: 2000ms
+      connect-timeout: 2000ms
+      lettuce:
+        pool:
+          max-active: 8
+          max-idle: 8
+          min-idle: 0
+          max-wait: -1ms
+        shutdown-timeout: 100ms
+  
+  # Configuración de Eureka
+  cloud:
+    config:
+      enabled: false
+
+# Configuración personalizada de caché
+app:
+  cache:
+    default-ttl: 600  # segundos
+    eventos:
+      ttl: 300        # 5 minutos para eventos
+      max-size: 1000
+    usuarios:
+      ttl: 1800       # 30 minutos para usuarios
+      max-size: 500
+    compras:
+      ttl: 900        # 15 minutos para compras
+      max-size: 200
+
+# Actuator endpoints
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,caches
+  endpoint:
+    health:
+      show-details: always
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+
+# Logging
+logging:
+  level:
+    com.lucaticket.cache: DEBUG
+    org.springframework.cache: TRACE
+    org.springframework.data.redis: INFO
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+
+# Swagger/OpenAPI
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    operationsSorter: method

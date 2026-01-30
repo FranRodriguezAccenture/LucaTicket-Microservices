@@ -1,0 +1,238 @@
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <!-- Header -->
+      <div class="d-flex align-items-center mb-4">
+        <a routerLink="/eventos" class="btn btn-outline-secondary me-3">
+          <i class="bi bi-arrow-left"></i>
+        </a>
+        <h1 class="mb-0">
+          <i class="bi bi-calendar-plus text-primary me-2"></i>
+          {{ tituloPagina }}
+        </h1>
+      </div>
+
+      <!-- Loading State -->
+      <div *ngIf="isLoading" class="text-center py-5">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">Cargando...</span>
+        </div>
+        <p class="mt-3 text-muted">Cargando información del evento...</p>
+      </div>
+
+      <!-- Form -->
+      <form [formGroup]="eventoForm" (ngSubmit)="onSubmit()" *ngIf="!isLoading">
+        <div class="card shadow border-0">
+          <div class="card-body p-4">
+            <!-- Información Básica -->
+            <div class="mb-4">
+              <h5 class="card-title mb-3">
+                <i class="bi bi-info-circle text-primary me-2"></i>
+                Información Básica
+              </h5>
+
+              <!-- Nombre -->
+              <div class="mb-3">
+                <label for="nombre" class="form-label">
+                  <i class="bi bi-card-heading me-1"></i>
+                  Nombre del Evento *
+                </label>
+                <input type="text" id="nombre" formControlName="nombre" class="form-control"
+                  [class.is-invalid]="eventoForm.get('nombre')?.invalid && eventoForm.get('nombre')?.touched"
+                  placeholder="Ej: Festival de Música Rock 2026">
+                <div *ngIf="eventoForm.get('nombre')?.invalid && eventoForm.get('nombre')?.touched"
+                  class="invalid-feedback">
+                  <span *ngIf="eventoForm.get('nombre')?.errors?.['required']">El nombre es obligatorio</span>
+                  <span *ngIf="eventoForm.get('nombre')?.errors?.['minlength']">Mínimo 3 caracteres</span>
+                  <span *ngIf="eventoForm.get('nombre')?.errors?.['maxlength']">Máximo 100 caracteres</span>
+                </div>
+              </div>
+
+              <!-- Descripción -->
+              <div class="mb-3">
+                <label for="descripcion" class="form-label">
+                  <i class="bi bi-text-paragraph me-1"></i>
+                  Descripción *
+                </label>
+                <textarea id="descripcion" formControlName="descripcion" class="form-control"
+                  [class.is-invalid]="eventoForm.get('descripcion')?.invalid && eventoForm.get('descripcion')?.touched"
+                  rows="3" placeholder="Describe el evento, artistas, actividades..."></textarea>
+                <div *ngIf="eventoForm.get('descripcion')?.invalid && eventoForm.get('descripcion')?.touched"
+                  class="invalid-feedback">
+                  <span *ngIf="eventoForm.get('descripcion')?.errors?.['required']">La descripción es obligatoria</span>
+                  <span *ngIf="eventoForm.get('descripcion')?.errors?.['minlength']">Mínimo 10 caracteres</span>
+                  <span *ngIf="eventoForm.get('descripcion')?.errors?.['maxlength']">Máximo 500 caracteres</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Fecha y Hora -->
+            <div class="row mb-4">
+              <div class="col-md-6 mb-3">
+                <h5 class="card-title mb-3">
+                  <i class="bi bi-calendar-date text-primary me-2"></i>
+                  Fecha y Hora
+                </h5>
+
+                <div class="mb-3">
+                  <label for="fechaEvento" class="form-label">
+                    <i class="bi bi-calendar me-1"></i>
+                    Fecha del Evento *
+                  </label>
+                  <input type="date" id="fechaEvento" formControlName="fechaEvento" class="form-control"
+                    [class.is-invalid]="eventoForm.get('fechaEvento')?.invalid && eventoForm.get('fechaEvento')?.touched">
+                  <div *ngIf="eventoForm.get('fechaEvento')?.invalid && eventoForm.get('fechaEvento')?.touched"
+                    class="invalid-feedback">
+                    La fecha es obligatoria
+                  </div>
+                </div>
+
+                <!-- Input de hora CORREGIDO -->
+                <div class="mb-3">
+                  <label for="horaEvento" class="form-label">
+                    <i class="bi bi-clock me-1"></i>
+                    Hora del Evento (HH:mm:ss) *
+                  </label>
+                  <input type="time" id="horaEvento" formControlName="horaEvento" class="form-control"
+                    [class.is-invalid]="eventoForm.get('horaEvento')?.invalid && eventoForm.get('horaEvento')?.touched"
+                    step="1" required>
+                  <small class="form-text text-muted">Formato: HH:mm:ss (ej: 18:30:00)</small>
+                  <div *ngIf="eventoForm.get('horaEvento')?.invalid && eventoForm.get('horaEvento')?.touched"
+                    class="invalid-feedback">
+                    La hora es obligatoria en formato HH:mm:ss
+                  </div>
+                </div>
+
+                <!-- Género y Ubicación -->
+                <div class="col-md-6 mb-3">
+                  <h5 class="card-title mb-3">
+                    <i class="bi bi-music-note-beamed text-primary me-2"></i>
+                    Género y Ubicación
+                  </h5>
+
+                  <div class="mb-3">
+                    <label for="genero" class="form-label">
+                      <i class="bi bi-tags me-1"></i>
+                      Género Musical *
+                    </label>
+                    <select id="genero" formControlName="genero" class="form-select"
+                      [class.is-invalid]="eventoForm.get('genero')?.invalid && eventoForm.get('genero')?.touched">
+                      <option value="" disabled selected>Selecciona un género</option>
+                      <option *ngFor="let genero of generosMusicales" [value]="genero">{{ genero }}</option>
+                    </select>
+                    <div *ngIf="eventoForm.get('genero')?.invalid && eventoForm.get('genero')?.touched"
+                      class="invalid-feedback">
+                      El género es obligatorio
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Precios -->
+              <div class="mb-4">
+                <h5 class="card-title mb-3">
+                  <i class="bi bi-cash-coin text-primary me-2"></i>
+                  Precios
+                </h5>
+
+                <div class="row">
+                  <div class="col-md-6 mb-3">
+                    <label for="precioMin" class="form-label">
+                      <i class="bi bi-currency-euro me-1"></i>
+                      Precio Mínimo (€) *
+                    </label>
+                    <input type="number" id="precioMin" formControlName="precioMin" class="form-control"
+                      [class.is-invalid]="eventoForm.get('precioMin')?.invalid && eventoForm.get('precioMin')?.touched"
+                      min="0" step="0.01">
+                    <div *ngIf="eventoForm.get('precioMin')?.invalid && eventoForm.get('precioMin')?.touched"
+                      class="invalid-feedback">
+                      <span *ngIf="eventoForm.get('precioMin')?.errors?.['required']">El precio mínimo es
+                        obligatorio</span>
+                      <span *ngIf="eventoForm.get('precioMin')?.errors?.['min']">El precio mínimo debe ser 0 o
+                        mayor</span>
+                    </div>
+                  </div>
+
+                  <div class="col-md-6 mb-3">
+                    <label for="precioMax" class="form-label">
+                      <i class="bi bi-currency-euro me-1"></i>
+                      Precio Máximo (€) *
+                    </label>
+                    <input type="number" id="precioMax" formControlName="precioMax" class="form-control"
+                      [class.is-invalid]="eventoForm.get('precioMax')?.invalid && eventoForm.get('precioMax')?.touched"
+                      min="0" step="0.01">
+                    <div *ngIf="eventoForm.get('precioMax')?.invalid && eventoForm.get('precioMax')?.touched"
+                      class="invalid-feedback">
+                      <span *ngIf="eventoForm.get('precioMax')?.errors?.['required']">El precio máximo es
+                        obligatorio</span>
+                      <span *ngIf="eventoForm.get('precioMax')?.errors?.['min']">El precio máximo debe ser 0 o
+                        mayor</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Validación precios -->
+                <div *ngIf="eventoForm.get('precioMin')?.value > eventoForm.get('precioMax')?.value"
+                  class="alert alert-warning mt-2">
+                  <i class="bi bi-exclamation-triangle me-2"></i>
+                  El precio máximo debe ser mayor o igual al precio mínimo
+                </div>
+              </div>
+
+              <!-- Ubicación -->
+              <div class="mb-4">
+                <h5 class="card-title mb-3">
+                  <i class="bi bi-geo-alt text-primary me-2"></i>
+                  Ubicación
+                </h5>
+
+                <div class="row">
+                  <div class="col-md-6 mb-3">
+                    <label for="localidad" class="form-label">
+                      <i class="bi bi-building me-1"></i>
+                      Localidad *
+                    </label>
+                    <input type="text" id="localidad" formControlName="localidad" class="form-control"
+                      [class.is-invalid]="eventoForm.get('localidad')?.invalid && eventoForm.get('localidad')?.touched"
+                      placeholder="Ej: Madrid, Barcelona...">
+                    <div *ngIf="eventoForm.get('localidad')?.invalid && eventoForm.get('localidad')?.touched"
+                      class="invalid-feedback">
+                      La localidad es obligatoria
+                    </div>
+                  </div>
+
+                  <div class="col-md-6 mb-3">
+                    <label for="recinto" class="form-label">
+                      <i class="bi bi-house-door me-1"></i>
+                      Recinto *
+                    </label>
+                    <input type="text" id="recinto" formControlName="recinto" class="form-control"
+                      [class.is-invalid]="eventoForm.get('recinto')?.invalid && eventoForm.get('recinto')?.touched"
+                      placeholder="Ej: Estadio Santiago Bernabéu, WiZink Center...">
+                    <div *ngIf="eventoForm.get('recinto')?.invalid && eventoForm.get('recinto')?.touched"
+                      class="invalid-feedback">
+                      El recinto es obligatorio
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Botones de acción -->
+              <div class="d-flex justify-content-between pt-3 border-top">
+                <button type="button" class="btn btn-outline-secondary" routerLink="/eventos">
+                  <i class="bi bi-x-circle me-1"></i>
+                  Cancelar
+                </button>
+
+                <button type="submit" class="btn btn-primary"
+                  [disabled]="eventoForm.invalid || isSubmitting || !validarPrecios()">
+                  <span *ngIf="isSubmitting" class="spinner-border spinner-border-sm me-2"></span>
+                  <i [class]="isSubmitting ? 'bi-arrow-repeat' : 'bi-check-circle'" class="bi me-1"></i>
+                  {{ botonTexto }}
+                </button>
+              </div>
+            </div>
+          </div>
+
+    </div>
+

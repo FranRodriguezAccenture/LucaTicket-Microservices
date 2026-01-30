@@ -1,0 +1,74 @@
+server:
+  port: 8082
+
+# Activar endpoints de SpringDoc
+springdoc:
+  api-docs:
+    enabled: true
+  swagger-ui:
+    enabled: true
+
+# Exponer endpoints manualmente
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,springdoc
+spring:
+  application:
+    name: lucaticket-ventas
+  
+  datasource:
+    url: jdbc:mysql://localhost:3306/lucaticket_ventas_db?createDatabaseIfNotExist=true&useSSL=false&serverTimezone=UTC
+    username: root
+    password: root  # Cambia según tu configuración
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
+        format_sql: true
+        jdbc:
+          batch_size: 20
+
+# Eureka
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+    enabled: false
+    fetch-registry: true
+    register-with-eureka: false
+  instance:
+    hostname: localhost
+    prefer-ip-address: false
+
+# LucaBanking config (ajustar según el servicio real)
+lucabanking:
+  url: http://localhost:8082  # O la URL real del servicio de pago
+  endpoint:
+    compra: /pasarela/compra
+
+# Eventos service (suponiendo que está en puerto 8081)
+eventos:
+  service:
+    url: http://localhost:8081
+    name: lucaticket-eventos  # Nombre en Eureka
+
+# Logging
+logging:
+  level:
+    com.lucaticket.ventas: DEBUG
+    org.springframework.web: DEBUG
+    org.hibernate.SQL: DEBUG
+
+# CORS Configuration
+cors:
+  allowed-origins: "http://localhost:4200"
+  allowed-methods: "GET,POST,PUT,DELETE,OPTIONS"
+  allowed-headers: "*"
+  allow-credentials: true

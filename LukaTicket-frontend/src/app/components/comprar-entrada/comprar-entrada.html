@@ -1,0 +1,553 @@
+<!-- DEBUG INFO -->
+<div *ngIf="eventoId" class="alert alert-info small mb-3">
+  <div class="d-flex justify-content-between align-items-center">
+    <div>
+      <i class="bi bi-info-circle me-1"></i>
+      <strong>Modo:</strong>
+      <span *ngIf="!usandoDatosSimulados" class="badge bg-success">CONECTADO</span>
+      <span class="ms-2">Evento ID: {{eventoId}} | Paso: {{pasoActual}}/4</span>
+    </div>
+    <div>
+      <button class="btn btn-sm btn-outline-secondary" (click)="toggleDebug()" title="Debug">
+        INICIAR LA COMPRA
+      </button>
+    </div>
+  </div>
+
+
+<div class="container py-4">
+  <!-- BOTÓN VOLVER -->
+  <div class="mb-4">
+    <button class="btn btn-outline-secondary" (click)="volverAlEvento()">
+      <i class="bi bi-arrow-left me-1"></i> Volver al evento
+    </button>
+  </div>
+
+  <!-- LOADING -->
+  <div *ngIf="isLoading" class="text-center py-5">
+    <div class="spinner-border text-primary mb-3" style="width: 3rem; height: 3rem;" role="status">
+      <span class="visually-hidden">Cargando...</span>
+    </div>
+    <h5 class="text-primary">Cargando información del evento...</h5>
+    <p class="text-muted small">POR FAVOR, PULSE INICIAR LA COMPRA</p>
+    <div class="progress mt-3" style="height: 6px; max-width: 300px; margin: 0 auto;">
+      <div class="progress-bar progress-bar-striped progress-bar-animated" style="width: 100%"></div>
+    </div>
+  </div>
+
+  <!-- ERROR -->
+  <div *ngIf="error && !isLoading" class="alert alert-danger">
+    <div class="d-flex align-items-center">
+      <i class="bi bi-exclamation-triangle-fill fs-4 me-3"></i>
+      <div>
+        <h5 class="alert-heading mb-2">Error al cargar el evento</h5>
+        <p class="mb-0">{{ error }}</p>
+        <div *ngIf="usandoDatosSimulados" class="mt-2 small">
+          <i class="bi bi-info-circle me-1"></i>
+          Usando datos de demostración. Las compras serán simuladas.
+        </div>
+      </div>
+    </div>
+    <div class="mt-3">
+      <button class="btn btn-outline-danger me-2" (click)="recargar()">
+        <i class="bi bi-arrow-clockwise me-1"></i> Reintentar
+      </button>
+      <button class="btn btn-danger" (click)="volverAlEvento()">
+        <i class="bi bi-house-door me-1"></i> Volver
+      </button>
+    </div>
+  </div>
+
+  <!-- PROCESO DE COMPRA -->
+  <div *ngIf="!isLoading && evento && !error" class="row">
+
+    <!-- COLUMNA IZQUIERDA: Resumen -->
+    <div class="col-lg-4 mb-4">
+      <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+          <h5 class="mb-0">Resumen del Evento</h5>
+        </div>
+        <div class="card-body">
+          <h6>{{evento.nombre}}</h6>
+          <p class="text-muted small">{{evento.descripcion}}</p>
+
+          <div class="mb-3">
+            <div class="d-flex align-items-center mb-2">
+              <i class="bi bi-calendar text-primary me-2"></i>
+              <div>
+                <small class="text-muted">Fecha</small>
+                <div><strong>{{formatearFecha(evento.fechaEvento)}}</strong></div>
+              </div>
+            </div>
+            <div class="d-flex align-items-center mb-2">
+              <i class="bi bi-clock text-primary me-2"></i>
+              <div>
+                <small class="text-muted">Hora</small>
+                <div><strong>{{evento.horaEvento}}</strong></div>
+              </div>
+            </div>
+            <div class="d-flex align-items-center mb-2">
+              <i class="bi bi-geo-alt text-primary me-2"></i>
+              <div>
+                <small class="text-muted">Lugar</small>
+                <div><strong>{{evento.recinto}}, {{evento.localidad}}</strong></div>
+              </div>
+            </div>
+            <div class="d-flex align-items-center">
+              <i class="bi bi-music-note-beamed text-primary me-2"></i>
+              <div>
+                <small class="text-muted">Género</small>
+                <div><strong>{{evento.genero}}</strong></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- RESUMEN COMPRA -->
+          <div class="border-top pt-3">
+            <h6>Resumen de compra</h6>
+            <div class="d-flex justify-content-between mb-1">
+              <span>{{nombreTipoEntrada}} (x{{cantidad}}):</span>
+              <span>{{subtotal | currency:'EUR'}}</span>
+            </div>
+            <div class="d-flex justify-content-between mb-2">
+              <span>Tarifa servicio:</span>
+              <span>{{tarifaServicio | currency:'EUR'}}</span>
+            </div>
+            <div class="d-flex justify-content-between fw-bold fs-5 pt-2 border-top">
+              <span>TOTAL:</span>
+              <span class="text-success">{{total | currency:'EUR'}}</span>
+            </div>
+          </div>
+
+          <!-- INFO MODO -->
+          <div *ngIf="usandoDatosSimulados" class="alert alert-warning mt-3 small">
+            <i class="bi bi-exclamation-triangle me-1"></i>
+            <strong>Modo demostración</strong><br>
+            Datos simulados para pruebas
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- COLUMNA DERECHA: Pasos -->
+    <div class="col-lg-8">
+      <div class="card shadow-sm">
+
+        <!-- CABECERA CON PASOS -->
+        <div class="card-header bg-white">
+          <h5 class="mb-0">Proceso de compra</h5>
+          <div class="steps mt-3">
+            <div class="d-flex justify-content-between">
+              <div *ngFor="let paso of [1,2,3,4]" class="text-center">
+                <div class="step-circle" [class.active]="pasoActual >= paso" [class.current]="pasoActual === paso">
+                  {{paso}}
+                </div>
+                <div class="step-label mt-1 small">
+                  <span *ngIf="paso===1">Entradas</span>
+                  <span *ngIf="paso===2">Datos</span>
+                  <span *ngIf="paso===3">Pago</span>
+                  <span *ngIf="paso===4">Confirmar</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- PASO 1: ENTRADAS -->
+        <div *ngIf="pasoActual === 1" class="card-body">
+          <h6 class="mb-4">Selecciona tus entradas</h6>
+
+          <!-- Tipo entrada -->
+          <div class="mb-4">
+            <label class="form-label fw-bold">Tipo de entrada</label>
+            <div class="row g-3">
+              <div *ngFor="let tipo of tiposEntrada" class="col-md-6">
+                <div class="card h-100 border-2 {{tipoSeleccionado === tipo.id ? 'border-primary' : 'border-light'}}"
+                  (click)="tipoSeleccionado = tipo.id" style="cursor: pointer;">
+                  <div class="card-body">
+                    <div class="form-check">
+                      <input type="radio" class="form-check-input" [checked]="tipoSeleccionado === tipo.id">
+                      <label class="form-check-label fw-bold">
+                        {{tipo.nombre}}
+                      </label>
+                    </div>
+                    <div class="text-primary fw-bold mt-2">{{tipo.precio | currency:'EUR'}}</div>
+                    <div class="text-muted small mt-1">
+                      <span *ngIf="tipo.id === 'general'">Acceso general</span>
+                      <span *ngIf="tipo.id === 'vip'">Acceso VIP + beneficios</span>
+                      <span *ngIf="tipo.id === 'platea'">Asientos platea</span>
+                      <span *ngIf="tipo.id === 'palco'">Palco privado</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Cantidad -->
+          <div class="mb-4">
+            <label class="form-label fw-bold">Cantidad de entradas</label>
+            <div class="d-flex align-items-center">
+              <button class="btn btn-outline-secondary" (click)="cantidad = cantidad - 1" [disabled]="cantidad <= 1">
+                <i class="bi bi-dash"></i>
+              </button>
+              <input type="number" class="form-control mx-2 text-center" style="width: 80px;" [(ngModel)]="cantidad"
+                min="1" max="10" (change)="validarCantidad()">
+              <button class="btn btn-outline-secondary" (click)="cantidad = cantidad + 1" [disabled]="cantidad >= 10">
+                <i class="bi bi-plus"></i>
+              </button>
+              <span class="ms-3 text-muted small">Máximo 10 entradas por compra</span>
+            </div>
+          </div>
+
+          <!-- Resumen selección -->
+          <div class="alert alert-light border">
+            <div class="d-flex justify-content-between">
+              <div>
+                <strong>Seleccionado:</strong> {{nombreTipoEntrada}} x{{cantidad}}
+              </div>
+              <div class="fw-bold text-primary">
+                {{(precioUnitario * cantidad) | currency:'EUR'}}
+              </div>
+            </div>
+          </div>
+
+          <!-- Botones -->
+          <div class="d-flex justify-content-between mt-4">
+            <button class="btn btn-outline-secondary" (click)="volverAlEvento()">
+              Cancelar
+            </button>
+            <button class="btn btn-primary" (click)="siguientePaso()" [disabled]="!tipoSeleccionado">
+              Siguiente: Datos personales <i class="bi bi-arrow-right ms-1"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- PASO 2: DATOS PERSONALES -->
+        <div *ngIf="pasoActual === 2" class="card-body">
+          <h6 class="mb-4">Tus datos personales</h6>
+
+          <form [formGroup]="formDatosPersonales">
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label class="form-label">Nombre *</label>
+                <input type="text" class="form-control" formControlName="nombre" placeholder="Tu nombre"
+                  [class.is-invalid]="formDatosPersonales.get('nombre')?.invalid && formDatosPersonales.get('nombre')?.touched">
+                <div *ngIf="formDatosPersonales.get('nombre')?.invalid && formDatosPersonales.get('nombre')?.touched"
+                  class="text-danger small mt-1">
+                  Nombre requerido (mínimo 2 caracteres)
+                </div>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Apellidos *</label>
+                <input type="text" class="form-control" formControlName="apellidos" placeholder="Tus apellidos"
+                  [class.is-invalid]="formDatosPersonales.get('apellidos')?.invalid && formDatosPersonales.get('apellidos')?.touched">
+                <div
+                  *ngIf="formDatosPersonales.get('apellidos')?.invalid && formDatosPersonales.get('apellidos')?.touched"
+                  class="text-danger small mt-1">
+                  Apellidos requeridos
+                </div>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Email *</label>
+                <input type="email" class="form-control" formControlName="email" placeholder="ejemplo@email.com"
+                  [class.is-invalid]="formDatosPersonales.get('email')?.invalid && formDatosPersonales.get('email')?.touched">
+                <div *ngIf="formDatosPersonales.get('email')?.invalid && formDatosPersonales.get('email')?.touched"
+                  class="text-danger small mt-1">
+                  Email inválido
+                </div>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Teléfono *</label>
+                <input type="tel" class="form-control" formControlName="telefono" placeholder="612345678"
+                  [class.is-invalid]="formDatosPersonales.get('telefono')?.invalid && formDatosPersonales.get('telefono')?.touched">
+                <div
+                  *ngIf="formDatosPersonales.get('telefono')?.invalid && formDatosPersonales.get('telefono')?.touched"
+                  class="text-danger small mt-1">
+                  Teléfono inválido (9 dígitos)
+                </div>
+              </div>
+              <div class="col-12">
+                <div class="form-check">
+                  <input type="checkbox" class="form-check-input" id="newsletter" formControlName="newsletter">
+                  <label class="form-check-label" for="newsletter">
+                    Quiero recibir información sobre próximos eventos y ofertas especiales
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <div class="alert alert-info mt-3 small">
+              <i class="bi bi-shield-check me-1"></i>
+              Tus datos están protegidos y solo se usarán para gestionar tu compra.
+            </div>
+          </form>
+
+          <div class="d-flex justify-content-between mt-4">
+            <button class="btn btn-outline-secondary" (click)="anteriorPaso()">
+              <i class="bi bi-arrow-left me-1"></i> Anterior
+            </button>
+            <button class="btn btn-primary" (click)="siguientePaso()" [disabled]="!formDatosPersonales.valid">
+              Siguiente: Pago <i class="bi bi-arrow-right ms-1"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- PASO 3: PAGO -->
+        <div *ngIf="pasoActual === 3" class="card-body">
+          <h6 class="mb-4">Método de pago</h6>
+
+          <!-- Selección método -->
+          <div class="mb-4">
+            <label class="form-label fw-bold">Selecciona método de pago</label>
+            <div class="row g-3">
+              <div *ngFor="let metodo of metodosPago" class="col-md-4">
+                <div
+                  class="card h-100 border-2 {{metodoPagoSeleccionado === metodo.id ? 'border-primary' : 'border-light'}}"
+                  (click)="metodoPagoSeleccionado = metodo.id" style="cursor: pointer;">
+                  <div class="card-body text-center py-4">
+                    <div class="form-check">
+                      <input type="radio" class="form-check-input" [checked]="metodoPagoSeleccionado === metodo.id">
+                      <label class="form-check-label fw-bold">
+                        {{metodo.nombre}}
+                      </label>
+                    </div>
+                    <div class="text-muted small mt-2">
+                      <span *ngIf="metodo.id === 'tarjeta'">Pago seguro</span>
+                      <span *ngIf="metodo.id === 'paypal'">Pago rápido</span>
+                      <span *ngIf="metodo.id === 'transferencia'">24-48 horas</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Instrucciones según método seleccionado -->
+          <div *ngIf="metodoPagoSeleccionado" class="alert alert-info mb-4">
+            <i class="bi bi-info-circle me-2"></i>
+            <strong>Instrucciones:</strong> {{getInstruccionesPago()}}
+          </div>
+
+          <!-- Formulario tarjeta (solo para tarjeta) -->
+          <div *ngIf="metodoPagoSeleccionado === 'tarjeta'">
+            <h6 class="mb-3">Datos de la tarjeta</h6>
+            <form [formGroup]="formTarjeta">
+              <div class="row g-3">
+                <div class="col-12">
+                  <label class="form-label">Número de tarjeta *</label>
+                  <input type="text" class="form-control" formControlName="numero" placeholder="1234 5678 9012 3456"
+                    maxlength="16"
+                    [class.is-invalid]="formTarjeta.get('numero')?.invalid && formTarjeta.get('numero')?.touched">
+                  <div *ngIf="formTarjeta.get('numero')?.invalid && formTarjeta.get('numero')?.touched"
+                    class="text-danger small mt-1">
+                    Número de tarjeta inválido (16 dígitos)
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">Fecha de expiración *</label>
+                  <input type="text" class="form-control" formControlName="expiracion" placeholder="MM/AA"
+                    [class.is-invalid]="formTarjeta.get('expiracion')?.invalid && formTarjeta.get('expiracion')?.touched">
+                  <div *ngIf="formTarjeta.get('expiracion')?.invalid && formTarjeta.get('expiracion')?.touched"
+                    class="text-danger small mt-1">
+                    Formato: MM/AA (ej: 12/25)
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">CVV *</label>
+                  <input type="text" class="form-control" formControlName="cvv" placeholder="123" maxlength="4"
+                    [class.is-invalid]="formTarjeta.get('cvv')?.invalid && formTarjeta.get('cvv')?.touched">
+                  <div *ngIf="formTarjeta.get('cvv')?.invalid && formTarjeta.get('cvv')?.touched"
+                    class="text-danger small mt-1">
+                    CVV inválido (3-4 dígitos)
+                  </div>
+                </div>
+                <div class="col-12">
+                  <label class="form-label">Nombre en la tarjeta *</label>
+                  <input type="text" class="form-control" formControlName="nombreTarjeta"
+                    placeholder="Como aparece en la tarjeta"
+                    [class.is-invalid]="formTarjeta.get('nombreTarjeta')?.invalid && formTarjeta.get('nombreTarjeta')?.touched">
+                  <div *ngIf="formTarjeta.get('nombreTarjeta')?.invalid && formTarjeta.get('nombreTarjeta')?.touched"
+                    class="text-danger small mt-1">
+                    Nombre requerido
+                  </div>
+                </div>
+              </div>
+            </form>
+
+            <div class="alert alert-light border mt-3 small">
+              <i class="bi bi-lock me-1"></i>
+              <strong>Pago seguro:</strong> Tus datos están cifrados y protegidos.
+            </div>
+          </div>
+
+          <!-- Panel para PayPal -->
+          <div *ngIf="metodoPagoSeleccionado === 'paypal'" class="border rounded p-4 text-center">
+            <i class="bi bi-paypal" style="font-size: 3rem; color: #003087;"></i>
+            <h5 class="mt-3">Pago con PayPal</h5>
+            <p class="text-muted">Serás redirigido a la plataforma segura de PayPal</p>
+            <div class="alert alert-warning small">
+              <i class="bi bi-shield-check me-1"></i>
+              PayPal ofrece protección al comprador y pago seguro
+            </div>
+          </div>
+
+          <!-- Panel para Transferencia -->
+          <div *ngIf="metodoPagoSeleccionado === 'transferencia'" class="border rounded p-4">
+            <i class="bi bi-bank" style="font-size: 2.5rem; color: #198754;"></i>
+            <h5 class="mt-2">Transferencia Bancaria</h5>
+            <div class="mt-3">
+              <p><strong>Ventajas:</strong></p>
+              <ul class="small">
+                <li>Sin comisiones adicionales</li>
+                <li>Pago seguro desde tu banco</li>
+                <li>Disponible 24/7</li>
+              </ul>
+              <p class="text-muted small">
+                <i class="bi bi-clock me-1"></i>
+                Tu entrada se activará al confirmar el pago (24-48 horas)
+              </p>
+            </div>
+          </div>
+
+          <!-- Loading durante pago -->
+          <div *ngIf="procesandoPago" class="text-center my-4 py-3">
+            <div class="spinner-border text-primary" role="status">
+              <span class="visually-hidden">Procesando...</span>
+            </div>
+            <p class="mt-2 text-muted">
+              <span *ngIf="metodoPagoSeleccionado === 'paypal'">Redirigiendo a PayPal...</span>
+              <span *ngIf="metodoPagoSeleccionado === 'transferencia'">Procesando transferencia...</span>
+              <span *ngIf="metodoPagoSeleccionado === 'tarjeta'">Procesando pago con tarjeta...</span>
+            </p>
+          </div>
+
+          <!-- Resumen final antes de pagar -->
+          <div class="alert alert-light border mt-4">
+            <div class="row">
+              <div class="col-md-6">
+                <strong>Total a pagar:</strong>
+                <div class="h4 text-success mt-1">{{total | currency:'EUR'}}</div>
+              </div>
+              <div class="col-md-6">
+                <strong>Método seleccionado:</strong>
+                <div class="mt-1">{{nombreMetodoPago}}</div>
+                <div class="small text-muted">{{getInstruccionesPago()}}</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Botones en el Paso 3 -->
+          <div class="d-flex justify-content-between mt-4">
+            <button class="btn btn-outline-secondary" (click)="anteriorPaso()" [disabled]="procesandoPago">
+              <i class="bi bi-arrow-left me-1"></i> Anterior
+            </button>
+
+            <!-- Botón dinámico según método de pago -->
+            <!-- Botón CORREGIDO - Paso 3 -->
+            <button class="btn btn-primary" (click)="iniciarProcesoPago()" [disabled]="!metodoPagoSeleccionado">
+              <span *ngIf="metodoPagoSeleccionado === 'tarjeta'">
+                <i class="bi bi-credit-card me-1"></i>Confirmar y pagar
+              </span>
+              <span *ngIf="metodoPagoSeleccionado === 'paypal'">
+                <i class="bi bi-paypal me-1"></i>Pagar con PayPal
+              </span>
+              <span *ngIf="metodoPagoSeleccionado === 'transferencia'">
+                <i class="bi bi-bank me-1"></i>Continuar con transferencia
+              </span>
+              <span *ngIf="!metodoPagoSeleccionado">
+                Seleccionar pago
+              </span>
+            </button>
+          </div>
+        </div>
+
+        <!-- PASO 4: CONFIRMACIÓN -->
+        <div *ngIf="pasoActual === 4" class="card-body">
+          <div class="text-center mb-4">
+            <i class="bi bi-check-circle-fill text-success" style="font-size: 4rem;"></i>
+            <h4 class="mt-3">¡Compra completada!</h4>
+            <p class="text-muted">Tu entrada ha sido reservada correctamente</p>
+            <div *ngIf="usandoDatosSimulados" class="alert alert-warning d-inline-block mt-2">
+              <i class="bi bi-exclamation-triangle me-1"></i>
+              Modo demostración - Compra simulada
+            </div>
+          </div>
+
+          <div class="alert alert-success">
+            <h5 class="mb-3">Resumen de tu compra</h5>
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <strong class="d-block">Número de referencia:</strong>
+                <div class="h4 text-primary">{{referencia}}</div>
+              </div>
+              <div class="col-md-6 mb-3">
+                <strong class="d-block">Fecha de compra:</strong>
+                <div class="h5">{{hoy | date:'dd/MM/yyyy HH:mm'}}</div>
+              </div>
+            </div>
+
+            <div class="border-top pt-3 mt-2">
+              <div class="row">
+                <div class="col-md-6">
+                  <strong>Evento:</strong><br>
+                  {{evento.nombre}}
+                </div>
+                <div class="col-md-6">
+                  <strong>Tipo de entrada:</strong><br>
+                  {{nombreTipoEntrada}} x{{cantidad}}
+                </div>
+              </div>
+
+              <div class="row mt-2">
+                <div class="col-md-6">
+                  <strong>Fecha del evento:</strong><br>
+                  {{formatearFecha(evento.fechaEvento)}} a las {{evento.horaEvento}}
+                </div>
+                <div class="col-md-6">
+                  <strong>Lugar:</strong><br>
+                  {{evento.recinto}}, {{evento.localidad}}
+                </div>
+              </div>
+
+              <div class="row mt-2">
+                <div class="col-md-6">
+                  <strong>Comprador:</strong><br>
+                  {{formDatosPersonales.value.nombre}} {{formDatosPersonales.value.apellidos}}<br>
+                  {{formDatosPersonales.value.email}}
+                </div>
+                <div class="col-md-6">
+                  <strong>Total pagado:</strong><br>
+                  <div class="h3 text-success mt-1">{{total | currency:'EUR'}}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="alert alert-info">
+            <h6><i class="bi bi-info-circle me-2"></i>Instrucciones importantes</h6>
+            <ul class="mb-0">
+              <li>Guarda tu número de referencia: <strong>{{referencia}}</strong></li>
+              <li>Presenta esta entrada en la entrada del evento</li>
+              <li>Llega 30 minutos antes del inicio</li>
+              <li>Trae tu documento de identificación</li>
+              <li>Recibirás un email de confirmación</li>
+            </ul>
+          </div>
+
+          <div class="d-grid gap-2 mt-4">
+            <button class="btn btn-primary btn-lg" (click)="descargarEntrada()">
+              <i class="bi bi-download me-2"></i>Descargar entrada (HTML)
+            </button>
+            <button class="btn btn-outline-primary" (click)="irAEventos()">
+              <i class="bi bi-calendar-event me-2"></i>Ver más eventos
+            </button>
+            <button class="btn btn-outline-secondary" (click)="volverAlEvento()">
+              <i class="bi bi-arrow-left me-2"></i>Volver al detalle del evento
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

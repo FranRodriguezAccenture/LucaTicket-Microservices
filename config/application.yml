@@ -1,0 +1,11 @@
+# Configuración global para todos los servicios
+spring:
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false
+    date-format: "yyyy-MM-dd HH:mm:ss"
+  
+logging:
+  level:
+    root: INFO
+    com.ejemplos: DEBUG

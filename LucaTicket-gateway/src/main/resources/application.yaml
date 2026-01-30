@@ -1,0 +1,23 @@
+server:
+  port: 8765
+  servlet:
+    context-path: /
+
+spring:
+  application:
+    name: simple-gateway
+
+# Actuator para health checks
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: always
+
+# Logging
+logging:
+  level:
+    com.lucaticket.gateway: DEBUG

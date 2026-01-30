@@ -1,0 +1,231 @@
+<header class="app-header bg-primary text-white py-5">
+  <div class="container">
+    <div class="row align-items-center">
+      <div class="col-md-2 text-center mb-3 mb-md-0">
+        <div class="display-1">
+          <i class="bi bi-ticket-perforated"></i>
+        </div>
+      </div>
+      <div class="col-md-10">
+        <h1 class="display-4 fw-bold mb-2">
+          LucaTicket
+        </h1>
+        <p class="lead mb-0 opacity-75">
+          <i class="bi bi-star-fill me-2"></i>Tu plataforma de venta de entradas para eventos
+        </p>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- Actualizar el navbar en tu app.component.html o layout -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top shadow">
+  <div class="container">
+
+
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav me-auto">
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/eventos" routerLinkActive="active">
+            <i class="bi bi-house-door me-1"></i> Inicio
+          </a>
+        </li>
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+            <i class="bi bi-grid-3x3-gap me-1"></i> Más
+          </a>
+          <ul class="dropdown-menu">
+            <li>
+              <a class="dropdown-item" href="#">
+                <i class="bi bi-calendar-check me-2"></i> Mis Eventos
+              </a>
+            </li>
+            <li>
+              <a class="dropdown-item" href="#">
+                <i class="bi bi-receipt me-2"></i> Mis Compras
+              </a>
+            </li>
+            <li><hr class="dropdown-divider"></li>
+            <li>
+              <a class="dropdown-item" href="#">
+                <i class="bi bi-gear me-2"></i> Configuración
+              </a>
+            </li>
+          </ul>
+        </li>
+      </ul>
+
+      <form class="d-flex me-3">
+        <input class="form-control form-control-sm" type="search" placeholder="Buscar eventos...">
+        <button class="btn btn-outline-light btn-sm ms-2" type="submit">
+          <i class="bi bi-search"></i>
+        </button>
+      </form>
+
+      <div class="navbar-nav">
+        <a class="btn btn-success btn-sm" routerLink="/eventos/nuevo">
+          <i class="bi bi-plus-lg me-1"></i> Crear Evento
+        </a>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- POR ESTO: -->
+<main class="app-main py-5">
+  <div class="container">
+    <!-- Alert de bienvenida SOLO en la página principal -->
+    <div *ngIf="isHomePage()" class="alert alert-info alert-dismissible fade show mb-4" role="alert">
+      <i class="bi bi-info-circle-fill me-2"></i>
+      <strong>¡Bienvenido!</strong> Descubre los mejores eventos y compra tus entradas de forma segura.
+      <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+
+    <!-- Estadísticas rápidas SOLO en la página principal -->
+    <div *ngIf="isHomePage()" class="row mb-5">
+      <div class="col-md-3 col-6 mb-3">
+        <div class="card border-0 shadow-sm text-center h-100">
+          <div class="card-body">
+            <div class="display-6 text-primary">
+              <i class="bi bi-calendar-check"></i>
+            </div>
+            <h3 class="card-title mt-2">10+</h3>
+            <p class="card-text text-muted small">Eventos Activos</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3 col-6 mb-3">
+        <div class="card border-0 shadow-sm text-center h-100">
+          <div class="card-body">
+            <div class="display-6 text-success">
+              <i class="bi bi-currency-euro"></i>
+            </div>
+            <h3 class="card-title mt-2">Desde 30€</h3>
+            <p class="card-text text-muted small">Precios desde</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3 col-6 mb-3">
+        <div class="card border-0 shadow-sm text-center h-100">
+          <div class="card-body">
+            <div class="display-6 text-warning">
+              <i class="bi bi-music-note-beamed"></i>
+            </div>
+            <h3 class="card-title mt-2">10+</h3>
+            <p class="card-text text-muted small">Géneros musicales</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3 col-6 mb-3">
+        <div class="card border-0 shadow-sm text-center h-100">
+          <div class="card-body">
+            <div class="display-6 text-danger">
+              <i class="bi bi-shield-check"></i>
+            </div>
+            <h3 class="card-title mt-2">101%</h3>
+            <p class="card-text text-muted small">Entradas seguras</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Aquí va el router-outlet para cargar dinámicamente los componentes -->
+    <router-outlet></router-outlet>
+  </div>
+</main>
+
+<footer class="app-footer bg-dark text-white py-5 mt-5">
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-4 mb-4">
+        <h5 class="mb-3">
+          <i class="bi bi-ticket-perforated me-2"></i>LucaTicket
+        </h5>
+        <p class="text-white-50">
+          Tu plataforma confiable para la compra de entradas a los mejores eventos musicales.
+        </p>
+        <div class="d-flex mt-3">
+          <a href="#" class="btn btn-outline-light btn-sm me-2">
+            <i class="bi bi-facebook"></i>
+          </a>
+          <a href="#" class="btn btn-outline-light btn-sm me-2">
+            <i class="bi bi-twitter"></i>
+          </a>
+          <a href="#" class="btn btn-outline-light btn-sm me-2">
+            <i class="bi bi-instagram"></i>
+          </a>
+          <a href="#" class="btn btn-outline-light btn-sm">
+            <i class="bi bi-linkedin"></i>
+          </a>
+        </div>
+      </div>
+
+      <div class="col-lg-4 mb-4">
+        <h5 class="mb-3">
+          <i class="bi bi-link-45deg me-2"></i>Enlaces Rápidos
+        </h5>
+        <ul class="list-unstyled">
+          <li class="mb-2">
+            <a href="#" class="text-white-50 text-decoration-none">
+              <i class="bi bi-chevron-right me-1"></i> Todos los Eventos
+            </a>
+          </li>
+          <li class="mb-2">
+            <a href="#" class="text-white-50 text-decoration-none">
+              <i class="bi bi-chevron-right me-1"></i> Eventos Destacados
+            </a>
+          </li>
+          <li class="mb-2">
+            <a href="#" class="text-white-50 text-decoration-none">
+              <i class="bi bi-chevron-right me-1"></i> Próximos Eventos
+            </a>
+          </li>
+          <li class="mb-2">
+            <a href="#" class="text-white-50 text-decoration-none">
+              <i class="bi bi-chevron-right me-1"></i> Contacto
+            </a>
+          </li>
+        </ul>
+      </div>
+
+      <div class="col-lg-4 mb-4">
+        <h5 class="mb-3">
+          <i class="bi bi-info-circle me-2"></i>Contacto
+        </h5>
+        <ul class="list-unstyled text-white-50">
+          <li class="mb-2">
+            <i class="bi bi-envelope me-2"></i> info@lucaticket.com
+          </li>
+          <li class="mb-2">
+            <i class="bi bi-telephone me-2"></i> +34 900 123 456
+          </li>
+          <li class="mb-2">
+            <i class="bi bi-geo-alt me-2"></i> Madrid, España
+          </li>
+          <li class="mb-2">
+            <i class="bi bi-clock me-2"></i> L-V: 9:00-18:00
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <hr class="my-4 bg-white-50">
+
+    <div class="row">
+      <div class="col-md-6">
+        <p class="mb-0 text-white-50">
+          <i class="bi bi-c-circle me-1"></i> 2026 LucaTicket - Todos los derechos reservados
+        </p>
+      </div>
+      <div class="col-md-6 text-md-end">
+        <a href="#" class="text-white-50 text-decoration-none me-3">Política de Privacidad</a>
+        <a href="#" class="text-white-50 text-decoration-none me-3">Términos y Condiciones</a>
+        <a href="#" class="text-white-50 text-decoration-none">Aviso Legal</a>
+      </div>
+    </div>
+  </div>
+</footer>
